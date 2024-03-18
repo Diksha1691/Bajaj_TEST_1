@@ -122,11 +122,7 @@ STEP-2
 
 import matplotlib.pyplot as plt
 
-gender_counts = data['gender']
-labels = list(gender_counts.keys())
-sizes = list(gender_counts.values())
-
-plt.pie(sizes, labels=labels)
+plt.pie(appointments, labels=gender, autopct='%1.1f%%')
 plt.axis('equal')
 plt.show()
 
