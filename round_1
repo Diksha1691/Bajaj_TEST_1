@@ -1,0 +1,136 @@
+LET THE TABLE NAME BE "yourTable"
+
+
+STEP 1:- 
+
+SELECT appointmentId, phoneNumber, patientDetails.firstName AS firstName,
+       patientDetails.lastName AS lastName,
+       CASE
+           WHEN patientDetails.gender = 'M' THEN 'male'
+           WHEN patientDetails.gender = 'F' THEN 'female'
+           ELSE 'others'
+           END AS gender,
+       DATE(patientDetails.birthDate) AS DOB,
+       consultationData.medicines
+FROM yourTable
+         JOIN patientDetails ON yourTable.patientId = patientDetails.patientId
+         JOIN consultationData ON yourTable.appointmentId = consultationData.appointmentId
+WHERE yourTable.doctorId = 17
+  AND allergies IS NOT NULL;
+
+
+b 
+
+import pyspark.sql.functions as F
+
+df = df.withColumn("fullName", F.concat(F.col("patientDetails.firstName"), F.lit(" "), F.col("patientDetails.lastName")))
+
+c
+import pandas as pd
+
+# Assuming 'df' is the DataFrame containing the phoneNumber column
+
+# Create a new column 'isValidMobile' with default value False
+df['isValidMobile'] = False
+
+# Define a function to check the validity of a phone number
+def isValidMobile(phoneNumber):
+    # Check if the phone number is a string and has a length of 10
+    if not isinstance(phoneNumber, str) or len(phoneNumber) != 10:
+        return False
+    # Check if the phone number starts with '91' or '+91'
+    if phoneNumber.startswith('91') or phoneNumber.startswith('+91'):
+        # Remove the prefix from the phone number
+        phoneNumber = phoneNumber[3:]
+    # Check if the phone number is a valid Indian phone number
+    if phoneNumber.isdigit() and int(phoneNumber) >= 6000000000 and int(phoneNumber) <= 9999999999:
+        return True
+    return False
+
+# Apply the function to the phoneNumber column
+df['isValidMobile'] = df['phoneNumber'].apply(isValidMobile)
+
+
+d
+
+import pandas as pd
+import hashlib
+
+# Assuming 'df' is the DataFrame containing the phoneNumber column
+
+# Create a new column 'phoneNumberHash' with default value None
+df['phoneNumberHash'] = None
+
+# Define a function to hash the phone number
+def hashPhoneNumber(phoneNumber):
+     if not isValidMobile(phoneNumber):
+        return None
+     hashedPhoneNumber = hashlib.sha256(phoneNumber.encode()).hexdigest()
+    return hashedPhoneNumber
+
+ df['phoneNumberHash'] = df['phoneNumber'].apply(hashPhoneNumber)
+
+def isValidMobile(phoneNumber):
+ 
+    if not isinstance(phoneNumber, str) or len(phoneNumber) != 10:
+        return False
+     if phoneNumber.startswith('91') or phoneNumber.startswith('+91'):
+        # Remove the prefix from the phone number
+        phoneNumber = phoneNumber[3:]
+     if phoneNumber.isdigit() and int(phoneNumber) >= 6000000000 and int(phoneNumber) <= 9999999999:
+        return True
+    return False
+
+
+e
+
+import datetime
+
+# Define a function to calculate age from DOB
+def calculate_age(dob):
+    today = datetime.date.today()
+    if dob is not None and isinstance(dob, datetime.date):
+        age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+        return age
+    else:
+        return None
+
+dataset['Age'] = dataset['patientDetails'].apply(lambda x: calculate_age(x['birthDate']))
+
+
+f
+
+
+dataset['noOfMedicines'] = dataset['consultationData'].apply(lambda x: len(x['medicines']))
+
+dataset['noOfActiveMedicines'] = dataset['consultationData'].apply(lambda x: sum(1 for medicine in x['medicines'] if medicine['isActive']))
+
+dataset['noOfInActiveMedicines'] = dataset['consultationData'].apply(lambda x: sum(1 for medicine in x['medicines'] if not medicine['isActive']))
+
+
+g
+
+# Add a new column 'medicineNames' to the dataset
+def get_medicine_names(row):
+    active_medicines = [medicine['medicineName'] for medicine in row['consultationData']['medicines'] if medicine['isActive']]
+    return ', '.join(active_medicines) if active_medicines else None
+
+dataset['medicineNames'] = dataset.apply(get_medicine_names, axis=1)
+
+
+STEP-2
+
+import matplotlib.pyplot as plt
+
+gender_counts = data['gender']
+labels = list(gender_counts.keys())
+sizes = list(gender_counts.values())
+
+plt.pie(sizes, labels=labels)
+plt.axis('equal')
+plt.show()
+
+STEP 2 
+
+
+       
